@@ -1,4 +1,4 @@
-### Test-SDL but completely chaged to use OpenGL
+### Test-SDL but completely changed to use OpenGL
 
 #### For the Mandelbrot renderer:
   - Control             : Arrow keys
