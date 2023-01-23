@@ -30,24 +30,35 @@ void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum se
 }
 
 
-void processInput(GLFWwindow* window, Shader& shader, float& x, float& y, float& scale)
+void processInput(GLFWwindow* window, Shader& shader, double& x, double& y, double& scale, float&offsetr, float& offsetg, float& offsetb)
 {
 	
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
-	//if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {y += 0.025 * scale;
-	//	shader.set2F("translate", x, y);}
-	//if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {y -= 0.025 * scale;
-	//	shader.set2F("translate", x, y);}
-	//if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {x += 0.025 * scale;
-	//	shader.set2F("translate", x, y);}
-	//if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {x -= 0.025 * scale;
-	//	shader.set2F("translate", x, y);}
-	//if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS){scale *= 1.025;
-	//	shader.set1F("scale", scale);}
-	//if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS){scale *= 0.975;
-	//	shader.set1F("scale", scale);}
-
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {y += 0.025 * scale;
+		shader.set2D("translate", x, y);}
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {y -= 0.025 * scale;
+		shader.set2D("translate", x, y);}
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {x += 0.025 * scale;
+		shader.set2D("translate", x, y);}
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {x -= 0.025 * scale;
+		shader.set2D("translate", x, y);}
+	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS){scale *= 1.025;
+		shader.set1D("scale", scale);}
+	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS){scale *= 0.975;
+		shader.set1D("scale", scale);}
+	if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS) {offsetr += 0.025;
+		shader.set3F("coloffset", offsetr, offsetg, offsetb);}
+	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {offsetg += 0.025;
+		shader.set3F("coloffset", offsetr, offsetg, offsetb);}
+	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS) {offsetb += 0.025;
+		shader.set3F("coloffset", offsetr, offsetg, offsetb);}
+	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS) {offsetr -= 0.025;
+		shader.set3F("coloffset", offsetr, offsetg, offsetb);}
+	if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS) {offsetg -= 0.025;
+		shader.set3F("coloffset", offsetr, offsetg, offsetb);}
+	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) {offsetb -= 0.025;
+		shader.set3F("coloffset", offsetr, offsetg, offsetb);}
 }
 
 int main()
@@ -149,16 +160,20 @@ int main()
 	glGetIntegerv(GL_MAX_COMPUTE_SHARED_MEMORY_SIZE, &count);
 	cout << count << endl;
 	
-	//VertexArray va1(2);
-	//Buffer buffer(positions1, sizeof(positions1), VBO);
-	//Buffer indexBuffer(indices, sizeof(indices), EBO);
-	//va1.AddAttribute(2, GL_FLOAT);
+	//Part of the fractal shader
+	VertexArray va1(2);
+	Buffer buffer(positions1, sizeof(positions1), VBO);
+	Buffer indexBuffer(indices, sizeof(indices), EBO);
+	va1.AddAttribute(2, GL_FLOAT);
 	
 	
 
-	float scale = 1;
-	float posx = 0;
-	float posy = 0;
+	double scale = 1;
+	double posx = 0;
+	double posy = 0;
+	float offsetr = 0.0;
+	float offsetg = 0.0;
+	float offsetb = 0.0;
 
 	const double frameTime = 125.0/18.0;
 	double time = glfwGetTime() * 1000;
@@ -167,7 +182,7 @@ int main()
 	while (!glfwWindowShouldClose(window))
 	{
 		//cout << time << endl;
-		processInput(window, shader, posx, posy, scale);
+		processInput(window, shader, posx, posy, scale, offsetr, offsetg, offsetb);
 		unsigned int dim = x;
 		
 
@@ -175,10 +190,10 @@ int main()
 
 
 
-
-		//shader.setUint("dim", dim);
-		//shader.Bind();
-		//renderer.Draw(va1, shader, indexBuffer);
+		//part of the fractal shader
+		shader.setUint("dim", dim);
+		shader.Bind();
+		renderer.Draw(va1, shader, indexBuffer);
 		
 
 		glfwSwapBuffers(window);

@@ -106,7 +106,18 @@ void Shader::set1F(const char* name, float& val1) {
 	glUniform1f(glGetUniformLocation(ID, name), val1);
 }
 
-
+void Shader::set4D(const char* name, double& val1, double& val2, double& val3, double& val4) {
+	glUniform4d(glGetUniformLocation(ID, name), val1, val2, val3, val4);
+}
+void Shader::set3D(const char* name, double& val1, double& val2, double& val3) {
+	glUniform3d(glGetUniformLocation(ID, name), val1, val2, val3);
+}
+void Shader::set2D(const char* name, double& val1, double& val2) {
+	glUniform2d(glGetUniformLocation(ID, name), val1, val2);
+}
+void Shader::set1D(const char* name, double& val1) {
+	glUniform1d(glGetUniformLocation(ID, name), val1);
+}
 
 
 void Shader::Bind() {
