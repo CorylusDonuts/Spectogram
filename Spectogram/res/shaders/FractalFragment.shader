@@ -7,13 +7,13 @@ in vec2 gl_FragCoord;
 uniform vec3 coloffset;
 uniform dvec2 translate;
 uniform double scale = 1.0;
-uniform unsigned int dim;
-
+uniform unsigned int dimx;
+uniform unsigned int dimy;
 
 void main()
 {
-	dvec2 coor = vec2(gl_FragCoord - (dim >> 1));
-	double size = double(dim);
+	dvec2 coor = vec2(gl_FragCoord.x - (dimx >> 1), gl_FragCoord.y - (dimy >> 1));
+	double size = double(dimx);
 	dvec2 c = translate + scale * (coor / size);
 	int maxIter = 500;
 

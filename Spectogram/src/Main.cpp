@@ -63,8 +63,8 @@ void processInput(GLFWwindow* window, Shader& shader, double& x, double& y, doub
 
 int main()
 {
-	const int x = 1000;
-	const int y = 1000;
+	const int x = 800;
+	const int y = 600;
 
 	
 
@@ -101,10 +101,10 @@ int main()
 
 
 	const float positions1[] = {
-		  0.8,  0.8,
-		 -0.8,  0.8,
-		 -0.8, -0.8,
-		  0.8, -0.8,
+		  1.0,  1.0,
+		 -1.0,  1.0,
+		 -1.0, -1.0,
+		  1.0, -1.0,
 	};
 	const unsigned int indices[] = {
 		0, 3, 2,
@@ -183,15 +183,16 @@ int main()
 	{
 		//cout << time << endl;
 		processInput(window, shader, posx, posy, scale, offsetr, offsetg, offsetb);
-		unsigned int dim = x;
-		
+		unsigned int dimx = x;
+		unsigned int dimy = y;
 
 		renderer.Clear();
 
 
 
 		//part of the fractal shader
-		shader.setUint("dim", dim);
+		shader.setUint("dimx", dimx);
+		shader.setUint("dimy", dimy);
 		shader.Bind();
 		renderer.Draw(va1, shader, indexBuffer);
 		
