@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <string>
 #include <math.h>
+#include <algorithm>
 
 #include "Renderer.h"
 #include "Shader.h"
@@ -30,7 +31,7 @@ void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum se
 }
 
 
-void processInput(GLFWwindow* window, Shader& shader, double& x, double& y, double& scale, float&offsetr, float& offsetg, float& offsetb)
+void processInput(GLFWwindow* window, Shader& shader, double& x, double& y, double& scale, float&offsetr, float& offsetg, float& offsetb, int& maxIter, float& distfac, float& shift)
 {
 	
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -47,24 +48,36 @@ void processInput(GLFWwindow* window, Shader& shader, double& x, double& y, doub
 		shader.set1D("scale", scale);}
 	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS){scale *= 0.975;
 		shader.set1D("scale", scale);}
-	if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS) {offsetr += 0.025;
+	if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS) {offsetr += 0.05;
+		shader.set3F("coloffset", offsetr, offsetg, offsetb);}		 
+	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {offsetg += 0.05;
+		shader.set3F("coloffset", offsetr, offsetg, offsetb);}		 
+	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS) {offsetb += 0.05;
+		shader.set3F("coloffset", offsetr, offsetg, offsetb);}		 
+	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS) {offsetr -= 0.05;
+		shader.set3F("coloffset", offsetr, offsetg, offsetb);}		 
+	if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS) {offsetg -= 0.05;
+		shader.set3F("coloffset", offsetr, offsetg, offsetb);}		 
+	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) {offsetb -= 0.05;
 		shader.set3F("coloffset", offsetr, offsetg, offsetb);}
-	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {offsetg += 0.025;
-		shader.set3F("coloffset", offsetr, offsetg, offsetb);}
-	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS) {offsetb += 0.025;
-		shader.set3F("coloffset", offsetr, offsetg, offsetb);}
-	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS) {offsetr -= 0.025;
-		shader.set3F("coloffset", offsetr, offsetg, offsetb);}
-	if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS) {offsetg -= 0.025;
-		shader.set3F("coloffset", offsetr, offsetg, offsetb);}
-	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) {offsetb -= 0.025;
-		shader.set3F("coloffset", offsetr, offsetg, offsetb);}
+	if (glfwGetKey(window, GLFW_KEY_EQUAL) == GLFW_PRESS) {maxIter = std::clamp(int(maxIter * 1.025), 40, 1500);
+		shader.setInt("maxIter", maxIter);}
+	if (glfwGetKey(window, GLFW_KEY_MINUS) == GLFW_PRESS) {maxIter = std::clamp(int(maxIter / 1.025), 40, 1500);
+		shader.setInt("maxIter", maxIter);}
+	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS) {distfac = std::clamp(distfac + float(0.001), float(0.0), float(1.0));
+		shader.set1F("distfac", distfac);}
+	if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS) {distfac = std::clamp(distfac - float(0.001), float(0.0), float(1.0));
+		shader.set1F("distfac", distfac);}
+	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) {shift += 0.1;
+		shader.set1F("shift", shift);}
+	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS) {shift -= 0.1;
+		shader.set1F("shift", shift);}
 }
 
 int main()
 {
-	const int x = 800;
-	const int y = 600;
+	const int x = 1920/2;
+	const int y = 1080/2;
 
 	
 
@@ -174,6 +187,9 @@ int main()
 	float offsetr = 0.0;
 	float offsetg = 0.0;
 	float offsetb = 0.0;
+	int maxIter = 600;
+	float distfac = 0.3;
+	float shift = 2.0;
 
 	const double frameTime = 125.0/18.0;
 	double time = glfwGetTime() * 1000;
@@ -182,7 +198,7 @@ int main()
 	while (!glfwWindowShouldClose(window))
 	{
 		//cout << time << endl;
-		processInput(window, shader, posx, posy, scale, offsetr, offsetg, offsetb);
+		processInput(window, shader, posx, posy, scale, offsetr, offsetg, offsetb, maxIter, distfac, shift);
 		unsigned int dimx = x;
 		unsigned int dimy = y;
 
