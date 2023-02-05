@@ -14,6 +14,7 @@ private:
 	unsigned short nums[64];
 	unsigned short offset[64];
 public:
+	//vertexLength is the sum of num that will be added to AddAttribute
 	VertexArray(unsigned int vertexLength);
 	void AddAttribute(const char num, const unsigned short type);
 
