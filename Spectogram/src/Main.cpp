@@ -66,50 +66,53 @@ int main()
 	glViewport(0, 0, x, y);
 
 	
-	////sample rate 1 / 10 s
-	//float signals[64]{0};
-	//float freq[64]{0};
-	//
-	//const float FREQ1 = 5;
-	//const float FREQ2 = 12;
-	//
-	//for (int i = 0; i < 64; i++) {
-	//	signals[i] = sinf(2 * 3.14159265359 * FREQ1 * i / 64) + sinf(2 * 3.14159265359 * FREQ2 * i / 64);
-	//}
-	//
-	//glEnable(GL_DEBUG_OUTPUT);
-	//glDebugMessageCallback(MessageCallback, 0);
-	//
-	//
-	//ComputeShader computeShader(R"r(.\res\shaders\Compute.shader)r");
-	//
-	//
-	//Buffer frequency(freq, sizeof(freq), SSBO);
-	//glBindBufferBase(SSBO, 4, frequency.GetID());
-	//Buffer signal(signals, sizeof(signals), SSBO);
-	//glBindBufferBase(SSBO, 3, signal.GetID());
-	//
-	//computeShader.Bind();
-	//glDispatchCompute(64, 1, 1);
-	//glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-	//
-	//float max = 0;
-	//int maxi = 0;
-	//float data[64]{0};
-	//frequency.Bind();
-	//glGetBufferSubData(SSBO, 0, 64 * 4, data);
-	//for (int i = 0; i < 64; i++) {
-	//	std::cout << data[i] << std::endl;
-	//	if (data[i] > max) {
-	//		max = data[i];
-	//		maxi = i;
-	//	}
-	//}
-	//std::cout << 50.0*maxi/64.0 << std::endl;
-	//
-	//int count;
-	//glGetIntegerv(GL_MAX_COMPUTE_SHARED_MEMORY_SIZE, &count);
-	//cout << count << endl;
+	//sample rate 1 / 10 s
+	float signals[64]{0};
+	float freq[64]{0};
+	
+	const float FREQ1 = 5;
+	const float FREQ2 = 12;
+	
+	for (int i = 0; i < 64; i++) {
+		signals[i] = sinf(2 * 3.14159265359 * FREQ1 * i / 64) + sinf(2 * 3.14159265359 * FREQ2 * i / 64);
+	}
+	
+	glEnable(GL_DEBUG_OUTPUT);
+	glDebugMessageCallback(MessageCallback, 0);
+	
+	
+	ComputeShader computeShader(R"r(.\res\shaders\Compute.shader)r");
+	
+	
+	Buffer frequency(freq, sizeof(freq), SSBO);
+	glBindBufferBase(SSBO, 4, frequency.GetID());
+	Buffer signal(signals, sizeof(signals), SSBO);
+	glBindBufferBase(SSBO, 3, signal.GetID());
+	
+	computeShader.Bind();
+	glDispatchCompute(64, 1, 1);
+	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+	
+	float max = 0;
+	int maxi = 0;
+	float data[64]{0};
+	frequency.Bind();
+	glGetBufferSubData(SSBO, 0, 64 * 4, data);
+	for (int i = 0; i < 64; i++) {
+		std::cout << data[i] << std::endl;
+		if (data[i] > max) {
+			max = data[i];
+			maxi = i;
+		}
+	}
+	std::cout << 50.0*maxi/64.0 << std::endl;
+	
+	int count;
+	glGetIntegerv(GL_MAX_COMPUTE_SHARED_MEMORY_SIZE, &count);
+	cout << "Shared memory max: " << count << endl;
+
+	glGetIntegerv(GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS, &count);
+	cout << "Local invocation max: " << count << endl;
 	
 	Renderer renderer;
 

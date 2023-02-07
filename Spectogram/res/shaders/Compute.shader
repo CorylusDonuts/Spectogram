@@ -14,13 +14,17 @@ layout(std430, binding = 4) buffer frequencies {
 shared int sumX;
 shared int sumY;
 
+//shared int minix[20];
+//shared int miniy[20];
+
 void main()
 {
-    float amplitude = signal[gl_LocalInvocationID.x];
-    float num = 50;
-    float winding = float(num * gl_WorkGroupID.x * gl_LocalInvocationID.x) / (64.0 * 64.0);
-    float x = amplitude * cos(2.0 * 3.14159265359 * winding);
-    float y = -1.0 * amplitude * sin(2.0 * 3.14159265359 * winding);
+    const float pi = 3.14159265359;
+    float amplitude = signal[gl_WorkGroupID.y * gl_LocalInvocationID.x + gl_LocalInvocationID.x];
+    float maxfreq = 50;
+    float theta = pi * float(2 * maxfreq * gl_WorkGroupID.x * (gl_WorkGroupID.y * gl_LocalInvocationID.x + gl_LocalInvocationID.x)) / float(gl_NumWorkGroups.x * gl_NumWorkGroups.y * gl_WorkGroupSize.x);
+    float x = amplitude * cos(theta);
+    float y = -1.0 * amplitude * sin(theta);
 
     if (gl_LocalInvocationID.x == 1) {
         sumX = 0;
