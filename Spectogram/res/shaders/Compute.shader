@@ -14,36 +14,52 @@ layout(std430, binding = 4) buffer frequencies {
 shared int sumX;
 shared int sumY;
 
-//shared int minix[20];
-//shared int miniy[20];
+shared float minix[gl_WorkGroupSize.x];
+shared float miniy[gl_WorkGroupSize.x];
 
 void main()
 {
+    unsigned int tid = gl_LocalInvocationID.x;
+    unsigned int max_tid = gl_WorkGroupSize.x;
+    unsigned int localID = gl_WorkGroupID.y * tid + tid;
     const float pi = 3.14159265359;
-    float amplitude = signal[gl_WorkGroupID.y * gl_LocalInvocationID.x + gl_LocalInvocationID.x];
+
+    float amplitude = signal[localID];
     float maxfreq = 50;
-    float theta = pi * float(2 * maxfreq * gl_WorkGroupID.x * (gl_WorkGroupID.y * gl_LocalInvocationID.x + gl_LocalInvocationID.x)) / float(gl_NumWorkGroups.x * gl_NumWorkGroups.y * gl_WorkGroupSize.x);
-    float x = amplitude * cos(theta);
-    float y = -1.0 * amplitude * sin(theta);
-
-    if (gl_LocalInvocationID.x == 1) {
-        sumX = 0;
-        sumY = 0;
+    float theta = pi * float(2 * maxfreq * gl_WorkGroupID.x * localID) / float(gl_NumWorkGroups.x * (gl_NumWorkGroups.y * max_tid));
+    minix[gl_LocalInvocationID.x] = amplitude * cos(theta);
+    miniy[gl_LocalInvocationID.x] = -1.0 * amplitude * sin(theta);
+    
+    
+    memoryBarrierShared();
+    barrier();
+    if (tid < 32) {
+        minix[tid] = minix[tid] + minix[tid + 32];
+        miniy[tid] = miniy[tid] + miniy[tid + 32];
     }
-
-    memoryBarrier();
+    memoryBarrierShared();
     barrier();
-
-    atomicAdd(sumX, int(1000000 * x));
-    atomicAdd(sumY, int(1000000 * y));
-
-    memoryBarrier();
+    if (tid < 16) {
+        minix[tid] = minix[tid] + minix[tid + 16];
+        miniy[tid] = miniy[tid] + miniy[tid + 16];
+    }
+    memoryBarrierShared();
     barrier();
-
-    if (gl_LocalInvocationID.x == 1) {
-        float xx = float(sumX) / 1000000.0;
-        float yy = float(sumY) / 1000000.0;
-        float res = sqrt(xx*xx + yy*yy) / 64.0;
-        frequency[gl_WorkGroupID.x] = res;
+    if (tid < 8) {
+        minix[tid] = minix[tid] + minix[tid + 8];
+        miniy[tid] = miniy[tid] + miniy[tid + 8];
+    }
+    memoryBarrierShared();
+    barrier();
+    if (tid < 4) {
+        minix[tid] = minix[tid] + minix[tid + 4];
+        miniy[tid] = miniy[tid] + miniy[tid + 4];
+    }
+    memoryBarrierShared();
+    barrier();
+    if (tid == 0) {
+        minix[tid] = minix[tid] + minix[tid + 1] + minix[tid + 2] + minix[tid + 3];
+        miniy[tid] = miniy[tid] + miniy[tid + 1] + miniy[tid + 2] + miniy[tid + 3];
+        frequency[gl_WorkGroupID.x] = sqrt(minix[tid] * minix[tid] + miniy[tid] * miniy[tid]) / max_tid;
     }
 }

@@ -8,6 +8,21 @@ Buffer::Buffer(const void* data, unsigned int size, GLenum bufferType) {
 	glBufferData(type, size, data, GL_STATIC_DRAW);
 }
 
+void Buffer::Read(void* newdata, unsigned int size, unsigned int index)
+{
+	Bind();
+	glGetBufferSubData(type, 4 * index, size, newdata);
+}
+void Buffer::Write(const void* newdata, unsigned int size, unsigned int index)
+{
+	Bind();
+	glBufferSubData(type, 4 * index, size, newdata);
+}
+
+void Buffer::BindIndex(unsigned int bindingIndex) {
+	glBindBufferBase(type, bindingIndex, ID);
+}
+
 void Buffer::Bind() {
 	glBindBuffer(type, ID);
 }

@@ -75,6 +75,12 @@ unsigned int ComputeShader::Compile(unsigned int type, const char* source) {
 	return id;
 }
 
+void ComputeShader::Dispatch(unsigned int x, unsigned int y, unsigned int z)
+{
+	Bind();
+	glDispatchCompute(x, y, z);
+}
+
 void ComputeShader::Bind() {
 	glUseProgram(ID);
 }

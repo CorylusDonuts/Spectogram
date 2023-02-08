@@ -81,23 +81,24 @@ int main()
 	glDebugMessageCallback(MessageCallback, 0);
 	
 	
-	ComputeShader computeShader(R"r(.\res\shaders\Compute.shader)r");
+	ComputeShader cs(R"r(.\res\shaders\Compute.shader)r");
 	
 	
 	Buffer frequency(freq, sizeof(freq), SSBO);
-	glBindBufferBase(SSBO, 4, frequency.GetID());
+	frequency.BindIndex(4);
 	Buffer signal(signals, sizeof(signals), SSBO);
-	glBindBufferBase(SSBO, 3, signal.GetID());
+	signal.BindIndex(3);
 	
-	computeShader.Bind();
-	glDispatchCompute(64, 1, 1);
+	//time resolution = 
+	//Array size = Samples * time resolution + samples * buffer
+	//Dispatch size: Samples, (samples / localsize), 1
+	cs.Dispatch(64, 1, 1);
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 	
 	float max = 0;
 	int maxi = 0;
 	float data[64]{0};
-	frequency.Bind();
-	glGetBufferSubData(SSBO, 0, 64 * 4, data);
+	frequency.Read(data, sizeof(data), 0);
 	for (int i = 0; i < 64; i++) {
 		std::cout << data[i] << std::endl;
 		if (data[i] > max) {

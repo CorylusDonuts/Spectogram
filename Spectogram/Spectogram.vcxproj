@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Spectogram.cpp" />
     <ClCompile Include="src\ComputeShader.cpp" />
     <ClCompile Include="src\Fractal.cpp" />
     <ClCompile Include="src\glad.c" />
@@ -33,6 +34,7 @@
     <ClInclude Include="src\Fractal.h" />
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\Shader.h" />
+    <ClInclude Include="src\Spectogram.h" />
     <ClInclude Include="src\VertexArray.h" />
     <ClInclude Include="src\Buffer.h" />
   </ItemGroup>
